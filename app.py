@@ -6,9 +6,9 @@ app = Flask(__name__)
 def index():
     return "¡mi_proyecto_flask!"
 
-@app.route('/usuarios/<nombre>')
-def usuarios(andres):
-    return f'Bienvenido, {andres}!'
+@app.route('/usuario/<nombre>')
+def usuario(nombre):
+    return f'Bienvenido, {nombre}!'
 
 @app.route('/contacto')
 def contacto():
