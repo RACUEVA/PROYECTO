@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Productos{% endblock %}
+
+{% block content %}
+
+<div class="header-with-btn">
+    <h1>Inventario de Productos</h1>
+    <a href="{{ url_for('crear_producto') }}" class="btn btn-primary">Añadir Nuevo Producto</a>
+</div>
+
+{% if productos %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th class="actions">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.id }}</td>
+            <td>{{ producto.nombre }}</td>
+            <td>${{ "%.2f"|format(producto.cantidad) }}</td>
+            <td>${{ "%.2f"|format(producto.precio) }}</td>
+            <td class="actions">
+                <a href="{{ url_for('editar_producto', pid=producto.id) }}" class="btn btn-small btn-secondary">Editar</a>
+                <form action="{{ url_for('eliminar_producto', pid=producto.id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este producto?');" style="display:inline;">
+                    <button type="submit" class="btn btn-small btn-danger">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>No hay productos en el inventario.</p>
+{% endif %}
+
+{% endblock %}

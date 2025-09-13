@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}{{ title or "Mi sitio Flask" }}{% endblock %}</title>
+    <title>{% block title %}{{ title or "LIBRERIA Y PAPELERIA CUEVA" }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
@@ -12,16 +12,26 @@
         <nav class="nav">
         <a href="{{ url_for('index') }}">Inicio</a>
         <a href="{{ url_for('about') }}">Acerca de</a>
-        <a href="{{ url_for('contacto') }}">Contactos</a>
+        <a href="{{ url_for('listar_productos') }}">Productos</a>
+        
         </nav>
     </header>
+{% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+        <div class="flash-container">
+        {% for cat, msg in msgs %}
+            <div class="flash {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
 
     <main class="container">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="site-footer">
-    <small>© {{ 2025 }} Derechos de autor</small>
+        <small>© {{ 2025 }} Derechos de autor. RA.CUEVA</small>
     </footer>
 
     {% block extra_js %}{% endblock %}
