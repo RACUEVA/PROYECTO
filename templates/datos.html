@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Datos TXT{% endblock %}
+{% block content %}
+<h1>Datos del Archivo TXT</h1>
+<ul>
+{% for dato in datos %}
+    <li>{{ dato }}</li>
+{% endfor %}
+</ul>
+{% endblock %}

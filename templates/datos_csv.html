@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Datos CSV{% endblock %}
+{% block content %}
+<h1>Datos del Archivo CSV</h1>
+<table border="1">
+    <thead>
+        <tr>
+            {% if datos %}
+            {% for key in datos[0].keys() %}
+            <th>{{ key }}</th>
+            {% endfor %}
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in datos %}
+        <tr>
+            {% for value in row.values() %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

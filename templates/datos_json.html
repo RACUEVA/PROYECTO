@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Datos JSON{% endblock %}
+{% block content %}
+<h1>Datos del Archivo JSON</h1>
+<pre>{{ datos | tojson(indent=2) }}</pre>
+{% endblock %}

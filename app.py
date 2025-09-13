@@ -3,6 +3,9 @@ from datetime import datetime
 from models import db, Producto
 from forms import ProductoForm
 from inventario import Inventario
+import json
+import csv
+import os
 
 app = Flask(__name__)
 # Configuración de la base de datos SQLite.
@@ -28,6 +31,9 @@ with app.app_context():
     except Exception as e:
         print(f"Error al cargar inventario desde BD: {e}. Inicializando inventario vacío.")
         inventario = Inventario()
+
+# Asegura que la carpeta 'datos' exista.
+os.makedirs('datos', exist_ok=True)
 
 # --- Rutas de la aplicación ---
 @app.route('/')
@@ -78,7 +84,7 @@ def editar_producto(pid):
     prod = Producto.query.get_or_404(pid)
     form = ProductoForm(obj=prod)
 
-    if form.validate_on_submit(): # Added validation check
+    if form.validate_on_submit():
         try:
             inventario.actualizar(
                 id=pid,
@@ -103,6 +109,66 @@ def eliminar_producto(pid):
     flash('Producto eliminado.' if ok else 'Producto no encontrado.', 'info' if ok else 'warning')
     return redirect(url_for('listar_productos'))
 
+# --- Rutas para Persistencia con Archivos ---
+@app.route('/guardar-txt', methods=['GET', 'POST'])
+def guardar_txt():
+    data_to_save = "Nuevo registro guardado."
+    with open('datos/datos.txt', 'a') as f:
+        f.write(data_to_save + '\n')
+    flash('Datos guardados en datos.txt', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/leer-txt')
+def leer_txt():
+    try:
+        with open('datos/datos.txt', 'r') as f:
+            datos = f.readlines()
+        return render_template('datos.html', title='Datos TXT', datos=datos)
+    except FileNotFoundError:
+        flash('El archivo datos.txt no existe.', 'danger')
+        return redirect(url_for('index'))
+
+@app.route('/guardar-json', methods=['GET', 'POST'])
+def guardar_json():
+    productos_json = [{'id': p.id, 'nombre': p.nombre, 'cantidad': p.cantidad, 'precio': p.precio}
+                      for p in inventario.listar_todos()]
+    with open('datos/datos.json', 'w') as f:
+        json.dump(productos_json, f, indent=4)
+    flash('Datos guardados en datos.json', 'success')
+    return redirect(url_for('listar_productos'))
+
+@app.route('/leer-json')
+def leer_json():
+    try:
+        with open('datos/datos.json', 'r') as f:
+            datos = json.load(f)
+        return render_template('datos_json.html', title='Datos JSON', datos=datos)
+    except (FileNotFoundError, json.JSONDecodeError):
+        flash('Error al leer el archivo JSON.', 'danger')
+        return redirect(url_for('index'))
+
+@app.route('/guardar-csv', methods=['GET', 'POST'])
+def guardar_csv():
+    header = ['id', 'nombre', 'cantidad', 'precio']
+    productos_csv = [p.to_tuple() for p in inventario.listar_todos()]
+    with open('datos/datos.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(productos_csv)
+    flash('Datos guardados en datos.csv', 'success')
+    return redirect(url_for('listar_productos'))
+
+@app.route('/leer-csv')
+def leer_csv():
+    try:
+        with open('datos/datos.csv', 'r') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            datos = [dict(zip(header, row)) for row in reader]
+        return render_template('datos_csv.html', title='Datos CSV', datos=datos)
+    except (FileNotFoundError, StopIteration):
+        flash('Error al leer el archivo CSV.', 'danger')
+        return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True)
-    

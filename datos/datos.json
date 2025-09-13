@@ -1,0 +1,50 @@
+[
+    {
+        "id": 3,
+        "nombre": "BORRADOR DE QUESO",
+        "cantidad": 100,
+        "precio": 0.25
+    },
+    {
+        "id": 2,
+        "nombre": "CUADERNNO ACADEMINCO 10HH CUADROS",
+        "cantidad": 10,
+        "precio": 3.0
+    },
+    {
+        "id": 6,
+        "nombre": "esfero",
+        "cantidad": 5,
+        "precio": 0.5
+    },
+    {
+        "id": 5,
+        "nombre": "goma",
+        "cantidad": 5,
+        "precio": 1.0
+    },
+    {
+        "id": 1,
+        "nombre": "lapiz hB",
+        "cantidad": 100,
+        "precio": 1.0
+    },
+    {
+        "id": 8,
+        "nombre": "marcador",
+        "cantidad": 10,
+        "precio": 1.25
+    },
+    {
+        "id": 7,
+        "nombre": "silocan",
+        "cantidad": 10,
+        "precio": 1.0
+    },
+    {
+        "id": 4,
+        "nombre": "tablero de plastico",
+        "cantidad": 10,
+        "precio": 85.0
+    }
+]
