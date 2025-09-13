@@ -36,6 +36,12 @@
         "precio": 1.25
     },
     {
+        "id": 9,
+        "nombre": "pinzas",
+        "cantidad": 100,
+        "precio": 0.5
+    },
+    {
         "id": 7,
         "nombre": "silocan",
         "cantidad": 10,
