@@ -14,26 +14,26 @@
             <div class="form-group">
                 {{ form.nombre.label }}
                 {{ form.nombre(class="input") }}
-                {% for error in form.nombre.errors %}
-                <span class="error">{{ error }}</span>
-                {% endfor %}
+                {% for e in form.nombre.errors %}
+                <span class="error">{{ error }}<<small class="error">{{ e }}</small>{% endfor %}
+
             </div>
             <div class="form-group">
                 {{ form.cantidad.label }}
                 {{ form.cantidad(class="input") }}
-                {% for error in form.cantidad.errors %}
-                <span class="error">{{ error }}</span>
-                {% endfor %}
+                {% for e in form.cantidad.errors %}
+                <span class="error">{{ error }}<small class="error">{{ e }}</small>{% endfor %}
+            
             </div>
             <div class="form-group">
                 {{ form.precio.label }}
                 {{ form.precio(class="input") }}
-                {% for error in form.precio.errors %}
-                <span class="error">{{ error }}</span>
-                {% endfor %}
+                {% for e in form.precio.errors %}
+                <span class="error">{{ error }}<small class="error">{{ e }}</small>{% endfor %}
             </div>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
+                <a class="btn btn-secondary" href="{{ url_for('listar_productos') }}">Cancelar</a>
             </div>
         </form>
     </div>

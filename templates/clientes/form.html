@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if modo == 'crear' %}Nuevo Cliente{% else %}Editar Cliente{% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <h1>{% if modo == 'crear' %}Añadir Cliente{% else %}Editar Cliente{% endif %}</h1>
+
+    <div class="form-card">
+        <form method="post">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                {{ form.nombre.label }}
+                {{ form.nombre(class="input") }}
+                {% for e in form.nombre.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.apellido.label }}
+                {{ form.apellido(class="input") }}
+                {% for e in form.apellido.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.telefono.label }}
+                {{ form.telefono(class="input") }}
+                {% for e in form.telefono.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.email.label }}
+                {{ form.email(class="input") }}
+                {% for e in form.email.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+                <a class="btn btn-secondary" href="{{ url_for('listar_clientes') }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

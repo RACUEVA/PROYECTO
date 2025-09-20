@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+
+<div class="header-with-btn">
+    <h1>Clientes</h1>
+    <a class="btn btn-primary" href="{{ url_for('crear_cliente') }}" > + Nuevo Cliente</a>
+</div>
+
+{% if clientes %}
+<table class="table">
+    <thead>
+    <tr>
+        <th>ID</th><th>Nombre</th><th>Apellido</th><th>Teléfono</th><th>Email</th><th>Fecha Registro</th><th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for c in clientes %}
+    <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.apellido }}</td>
+        <td>{{ c.telefono }}</td>
+        <td>{{ c.email }}</td>
+        <td>{{ c.fecha_registro.strftime('%Y-%m-%d') if c.fecha_registro else '' }}</td>
+        <td>
+        <a class="btn btn-small" href="{{ url_for('editar_cliente', cid=c.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('eliminar_cliente', cid=c.id) }}" style="display:inline"
+                onsubmit="return confirm('¿Eliminar {{ c.nombre }} {{ c.apellido }}?');">
+            <button type="submit" class="btn btn-danger btn-small">Eliminar</button>
+        </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay clientes para mostrar.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "nombre": "lapiz",
+        "cantidad": "10",
+        "precio": 1.0
+    },
+    {
+        "id": 30,
+        "nombre": "borrador",
+        "cantidad": "100",
+        "precio": 1.0
+    },
+    {
+        "id": 31,
+        "nombre": "tablero de madera",
+        "cantidad": "10",
+        "precio": 25.0
+    },
+    {
+        "id": 32,
+        "nombre": "Lápiz HB",
+        "cantidad": "100",
+        "precio": 1.0
+    },
+    {
+        "id": 33,
+        "nombre": "Borrador",
+        "cantidad": "50",
+        "precio": 1.0
+    },
+    {
+        "id": 34,
+        "nombre": "Cuaderno",
+        "cantidad": "30",
+        "precio": 3.0
+    },
+    {
+        "id": 35,
+        "nombre": "Bolígrafo azul",
+        "cantidad": "200",
+        "precio": 1.0
+    }
+]

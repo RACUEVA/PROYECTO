@@ -31,3 +31,12 @@ class Producto(db.Model):
         Útil para la visualización o exportación de datos.
         """
         return (self.id, self.nombre, self.cantidad, self.precio)
+
+class Usuario(db.Model):
+    __tablename__ = 'usuarios'
+    id_usuario = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    mail = db.Column(db.String(120), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Usuario {self.id_usuario} {self.nombre}>'
