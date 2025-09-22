@@ -11,16 +11,16 @@ def conexion():
             password='uea2025'
         )
         if conn.is_connected():
-            print("Conexión exitosa a la base de datos")
+            print("✓ Conexión exitosa a la base de datos")
             return conn
     except Error as e:
-        print(f"Error al conectar a MySQL: {e}")
+        print(f"✗ Error al conectar a MySQL: {e}")
         return None
 
 def cerrar_conexion(conn):
     if conn and conn.is_connected():
         conn.close()
-        print("Conexión a la base de datos cerrada.")
+        print("✓ Conexión a la base de datos cerrada.")
 
 def crear_tablas():
     conn = None
@@ -32,6 +32,7 @@ def crear_tablas():
             
         cursor = conn.cursor()
         
+        # Tabla de productos
         sql_productos = """
         CREATE TABLE IF NOT EXISTS productos (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -41,6 +42,7 @@ def crear_tablas():
         );
         """
         
+        # Tabla de clientes
         sql_clientes = """
         CREATE TABLE IF NOT EXISTS clientes (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,16 +54,34 @@ def crear_tablas():
         );
         """
         
-        print("Creando tabla 'productos'...")
-        cursor.execute(sql_productos)
-        print("Tabla 'productos' creada o ya existe.")
+        # Tabla de usuarios (para el sistema de login)
+        sql_usuarios = """
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(120) NOT NULL,
+            email VARCHAR(120) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """
         
-        print("Creando tabla 'clientes'...")
+        print("Verificando/Creando tabla 'productos'...")
+        cursor.execute(sql_productos)
+        
+        print("Verificando/Creando tabla 'clientes'...")
         cursor.execute(sql_clientes)
-        print("Tabla 'clientes' creada o ya existe.")
+        
+        print("Verificando/Creando tabla 'usuarios'...")
+        cursor.execute(sql_usuarios)
         
         conn.commit()
-        print("Tablas creadas correctamente.")
+        print("Todas las tablas verificadas/creadas correctamente.")
+        
+        # Verificar que las tablas existen
+        cursor.execute("SHOW TABLES")
+        tablas = cursor.fetchall()
+        print("Tablas en la base de datos:", [tabla[0] for tabla in tablas])
+        
         return True
         
     except Error as e:

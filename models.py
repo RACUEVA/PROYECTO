@@ -1,42 +1,37 @@
-# models.py
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
+class Usuario(UserMixin, db.Model):
+    __tablename__ = 'usuarios'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    fecha_registro = db.Column(db.DateTime, default=db.func.current_timestamp())
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+        
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def __repr__(self):
+        return f'<Usuario {self.id} {self.nombre}>'
+
 class Producto(db.Model):
-    # Nombre de la tabla en la base de datos.
     __tablename__ = 'productos'
     
-    # Columna 'id': Clave primaria, se autoincrementa.
     id = db.Column(db.Integer, primary_key=True)
-    
-    # Columna 'nombre': Cadena de 120 caracteres, única y no nula.
     nombre = db.Column(db.String(120), unique=True, nullable=False)
-    
-    # Columna 'cantidad': Entero, no nulo, con un valor por defecto de 0.
     cantidad = db.Column(db.Integer, nullable=False, default=0)
-    
-    # Columna 'precio': Número de punto flotante, no nulo, con valor por defecto 0.0.
     precio = db.Column(db.Float, nullable=False, default=0.0)
     
     def __repr__(self):
-        """
-        Método de representación para depuración.
-        """
         return f'<Producto {self.id} {self.nombre}>'
 
     def to_tuple(self):
-        """
-        Convierte la información del producto a una tupla.
-        Útil para la visualización o exportación de datos.
-        """
         return (self.id, self.nombre, self.cantidad, self.precio)
-
-class Usuario(db.Model):
-    __tablename__ = 'usuarios'
-    id_usuario = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(120), nullable=False)
-    mail = db.Column(db.String(120), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<Usuario {self.id_usuario} {self.nombre}>'

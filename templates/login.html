@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h2>Iniciar Sesión</h2>
+    
+    <form method="post">
+        {{ form.csrf_token }}
+        
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(class="input") }}
+            {% for error in form.email.errors %}
+            <small class="error">{{ error }}</small>
+            {% endfor %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password(class="input") }}
+            {% for error in form.password.errors %}
+            <small class="error">{{ error }}</small>
+            {% endfor %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+            <a class="btn btn-secondary" href="{{ url_for('registro') }}">Registrarse</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,11 +1,9 @@
 {% extends "base.html" %}
-
 {% block title %}
     {% if modo == 'crear' %}Nuevo Producto{% else %}Editar Producto{% endif %}
 {% endblock %}
 
 {% block content %}
-
     <h1>{% if modo == 'crear' %}Añadir Producto{% else %}Editar Producto{% endif %}</h1>
 
     <div class="form-card">
@@ -15,21 +13,22 @@
                 {{ form.nombre.label }}
                 {{ form.nombre(class="input") }}
                 {% for e in form.nombre.errors %}
-                <span class="error">{{ error }}<<small class="error">{{ e }}</small>{% endfor %}
-
+                <small class="error">{{ e }}</small>
+                {% endfor %}
             </div>
             <div class="form-group">
                 {{ form.cantidad.label }}
                 {{ form.cantidad(class="input") }}
                 {% for e in form.cantidad.errors %}
-                <span class="error">{{ error }}<small class="error">{{ e }}</small>{% endfor %}
-            
+                <small class="error">{{ e }}</small>
+                {% endfor %}
             </div>
             <div class="form-group">
                 {{ form.precio.label }}
                 {{ form.precio(class="input") }}
                 {% for e in form.precio.errors %}
-                <span class="error">{{ error }}<small class="error">{{ e }}</small>{% endfor %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
             </div>
             <div class="form-group">
                 {{ form.submit(class="btn btn-primary") }}
@@ -37,5 +36,4 @@
             </div>
         </form>
     </div>
-
 {% endblock %}

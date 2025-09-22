@@ -1,19 +1,21 @@
 {% extends "base.html" %}
+{% block title %}Productos{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Productos</h2>
-    
+    <div class="header-with-btn">
+        <h1>Productos</h1>
+        <a class="btn btn-primary" href="{{ url_for('crear_producto') }}"> + Nuevo Producto</a>
+    </div>
+
     <!-- Barra de búsqueda -->
-    <form method="get" class="search-form">
-        <input type="text" name="q" placeholder="Buscar productos..." value="{{ q }}">
-        <button type="submit">Buscar</button>
+    <form method="get" class="form-inline">
+        <input type="text" name="q" class="input" placeholder="Buscar productos..." value="{{ q }}">
+        <button type="submit" class="btn">Buscar</button>
     </form>
-    
-    <!-- Botón para nuevo producto -->
-    <a href="{{ url_for('crear_producto') }}" class="btn btn-primary">+ Nuevo Producto</a>
-    
+
     <!-- Tabla de productos -->
+    {% if productos %}
     <table class="table">
         <thead>
             <tr>
@@ -31,21 +33,20 @@
                 <td>{{ producto.nombre }}</td>
                 <td>{{ producto.cantidad }}</td>
                 <td>${{ "%.2f"|format(producto.precio) }}</td>
-                <td>
+                <td class="acciones">
                     <a class="btn btn-small" href="{{ url_for('editar_producto', pid=producto.id) }}">Editar</a>
-                    <form action="{{ url_for('eliminar_producto', pid=producto.id) }}" method="post" style="display:inline;">
+                    <form method="post" action="{{ url_for('eliminar_producto', pid=producto.id) }}" style="display:inline">
                         <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
                     </form>
                 </td>
             </tr>
-            {% else %}
-            <tr>
-                <td colspan="5">No hay productos registrados</td>
-            </tr>
             {% endfor %}
         </tbody>
     </table>
-    
+    {% else %}
+    <p>No hay productos para mostrar.</p>
+    {% endif %}
+
     <!-- Botones de exportación -->
     <div class="export-buttons">
         <a href="{{ url_for('guardar_txt') }}" class="btn btn-secondary">Exportar TXT</a>
