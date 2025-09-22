@@ -67,3 +67,4 @@ class Usuario(UserMixin):
             return None
         finally:
             cerrar_conexion(conn)
+            

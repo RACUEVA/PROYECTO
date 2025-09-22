@@ -35,3 +35,4 @@ class Producto(db.Model):
 
     def to_tuple(self):
         return (self.id, self.nombre, self.cantidad, self.precio)
+    

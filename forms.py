@@ -27,3 +27,4 @@ class RegistroForm(FlaskForm):
     password = PasswordField('Contraseña', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirmar Contraseña', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Registrarse')
+    
