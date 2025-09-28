@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}Diagnóstico del Sistema{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-stethoscope"></i> Diagnóstico del Sistema</h1>
+    <p class="text-muted">Estado actual y configuración del sistema</p>
+</div>
+
+<div class="diagnostic-grid">
+    <!-- Tarjeta de Estado General -->
+    <div class="diagnostic-card">
+        <h3><i class="fas fa-heartbeat"></i> Estado General</h3>
+        <div class="status-list">
+            <div class="status-item {% if resultado.base_datos_conectable %}status-ok{% else %}status-error{% endif %}">
+                <span class="status-label">Conexión a Base de Datos:</span>
+                <span class="status-value">
+                    {% if resultado.base_datos_conectable %}
+                    <i class="fas fa-check-circle"></i> Conectada
+                    {% else %}
+                    <i class="fas fa-times-circle"></i> Error
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="status-item {% if resultado.tabla_usuarios_existe %}status-ok{% else %}status-error{% endif %}">
+                <span class="status-label">Tabla de Usuarios:</span>
+                <span class="status-value">
+                    {% if resultado.tabla_usuarios_existe %}
+                    <i class="fas fa-check-circle"></i> Existente
+                    {% else %}
+                    <i class="fas fa-times-circle"></i> No encontrada
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="status-item {% if resultado.usuario_autenticado %}status-ok{% else %}status-info{% endif %}">
+                <span class="status-label">Usuario Autenticado:</span>
+                <span class="status-value">
+                    {% if resultado.usuario_autenticado %}
+                    <i class="fas fa-check-circle"></i> Sí
+                    {% else %}
+                    <i class="fas fa-info-circle"></i> No
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="status-item status-info">
+                <span class="status-label">Fecha del Servidor:</span>
+                <span class="status-value">{{ resultado.fecha_servidor }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjeta de Estadísticas -->
+    <div class="diagnostic-card">
+        <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+        <div class="stats-list">
+            <div class="stat-item">
+                <span class="stat-label">Total Usuarios:</span>
+                <span class="stat-value">{{ resultado.total_usuarios if resultado.total_usuarios else 0 }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Productos:</span>
+                <span class="stat-value">{{ resultado.total_productos if resultado.total_productos else 0 }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Clientes:</span>
+                <span class="stat-value">{{ resultado.total_clientes if resultado.total_clientes else 0 }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tablas de la Base de Datos -->
+<div class="diagnostic-card">
+    <h3><i class="fas fa-database"></i> Tablas de la Base de Datos</h3>
+    {% if resultado.tablas_existentes %}
+    <div class="tables-grid">
+        {% for tabla in resultado.tablas_existentes %}
+        <div class="table-badge">
+            <i class="fas fa-table"></i> {{ tabla }}
+        </div>
+        {% endfor %}
+    </div>
+    <small class="text-muted">Total: {{ resultado.tablas_existentes|length }} tablas</small>
+    {% else %}
+    <p class="text-muted">No se pudieron cargar las tablas de la base de datos.</p>
+    {% endif %}
+</div>
+
+<!-- Información del Sistema -->
+<div class="diagnostic-card">
+    <h3><i class="fas fa-info-circle"></i> Información del Sistema</h3>
+    <div class="system-info">
+        <div class="info-item">
+            <strong>Aplicación:</strong> Librería y Papelería Cueva
+        </div>
+        <div class="info-item">
+            <strong>Framework:</strong> Flask
+        </div>
+        <div class="info-item">
+            <strong>Base de Datos:</strong> MySQL
+        </div>
+        <div class="info-item">
+            <strong>Autenticación:</strong> Flask-Login
+        </div>
+    </div>
+</div>
+
+<!-- Acciones de Diagnóstico -->
+<div class="diagnostic-actions">
+    <h3><i class="fas fa-tools"></i> Acciones</h3>
+    <div class="actions-grid">
+        <a href="{{ url_for('health_check') }}" target="_blank" class="action-btn">
+            <i class="fas fa-heartbeat"></i>
+            <span>Health Check</span>
+        </a>
+        <a href="{{ url_for('listar_productos') }}" class="action-btn">
+            <i class="fas fa-box"></i>
+            <span>Ver Productos</span>
+        </a>
+        <a href="{{ url_for('listar_clientes') }}" class="action-btn">
+            <i class="fas fa-users"></i>
+            <span>Ver Clientes</span>
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="action-btn">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+    </div>
+</div>
+
+<!-- Mensaje de Error -->
+{% if resultado.error %}
+<div class="diagnostic-card error-card">
+    <h3><i class="fas fa-exclamation-triangle"></i> Error Detectado</h3>
+    <div class="error-message">
+        <code>{{ resultado.error }}</code>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.diagnostic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.diagnostic-card {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+}
+
+.status-list, .stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.status-item, .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+}
+
+.status-ok .status-value {
+    color: var(--ok);
+}
+
+.status-error .status-value {
+    color: var(--danger);
+}
+
+.status-info .status-value {
+    color: var(--brand);
+}
+
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.table-badge {
+    background: var(--brand);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.system-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item {
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.25rem;
+}
+
+.diagnostic-actions {
+    margin-top: 2rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.action-btn {
+    background: var(--card);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--fg);
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn:hover {
+    background: var(--brand);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.error-card {
+    border-color: var(--danger);
+}
+
+.error-message {
+    background: rgba(220, 38, 38, 0.1);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    font-family: monospace;
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .diagnostic-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tables-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

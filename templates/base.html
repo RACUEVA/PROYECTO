@@ -2,37 +2,76 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}{{ title or "LIBRERIA Y PAPELERIA CUEVA" }}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ title or "Librería y Papelería Cueva" }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% block head_extra %}{% endblock %}
 </head>
 <body>
     <header class="site-header">
         <nav class="nav">
-            <a href="{{ url_for('index') }}">Inicio</a>
-            <a href="{{ url_for('about') }}">Acerca de</a>
-            
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('listar_productos') }}">Productos</a>
-                <a href="{{ url_for('listar_clientes') }}">Clientes</a>
-                <a href="{{ url_for('guardar_txt') }}">Guardar TXT</a>
-                <a href="{{ url_for('guardar_json') }}">Guardar JSON</a>
-                <a href="{{ url_for('guardar_csv') }}">Guardar CSV</a>
-                <a href="{{ url_for('logout') }}">Cerrar Sesión ({{ current_user.nombre }})</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Iniciar Sesión</a>
-                <a href="{{ url_for('registro') }}">Registrarse</a>
-            {% endif %}
+            <a href="{{ url_for('index') }}" class="nav-brand">
+                <i class="fas fa-book"></i> Librería y Papelería Cueva
+            </a>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" 
+                    {% if request.endpoint == 'index' %}class="active"{% endif %}>
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                <a href="{{ url_for('about') }}" 
+                    {% if request.endpoint == 'about' %}class="active"{% endif %}>
+                    <i class="fas fa-info-circle"></i> Acerca de
+                </a>
+                
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('listar_productos') }}" 
+                        {% if request.endpoint in ['listar_productos', 'crear_producto', 'editar_producto'] %}class="active"{% endif %}>
+                        <i class="fas fa-box"></i> Productos
+                    </a>
+                    
+                    <a href="{{ url_for('listar_clientes') }}" 
+                        {% if request.endpoint in ['listar_clientes', 'crear_cliente', 'editar_cliente'] %}class="active"{% endif %}>
+                        <i class="fas fa-users"></i> Clientes
+                    </a>
+                    
+                    <div class="export-dropdown">
+                        <a href="#" class="btn btn-secondary btn-small">
+                            <i class="fas fa-download"></i> Exportar
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('guardar_txt') }}">TXT</a>
+                            <a href="{{ url_for('guardar_json') }}">JSON</a>
+                            <a href="{{ url_for('guardar_csv') }}">CSV</a>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger btn-small">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                    <a href="{{ url_for('registro') }}" class="btn btn-secondary">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                {% endif %}
+            </div>
         </nav>
     </header>
 
     {% with msgs = get_flashed_messages(with_categories=true) %}
         {% if msgs %}
-            <div class="flash-container">
-            {% for cat, msg in msgs %}
-                <div class="flash {{ cat }}">{{ msg }}</div>
-            {% endfor %}
+            <div class="container">
+                <div class="flash-container">
+                {% for cat, msg in msgs %}
+                    <div class="flash {{ cat }}">
+                        <i class="fas fa-{% if cat == 'success' %}check-circle{% elif cat == 'error' %}exclamation-circle{% elif cat == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                        {{ msg }}
+                    </div>
+                {% endfor %}
+                </div>
             </div>
         {% endif %}
     {% endwith %}
@@ -42,9 +81,95 @@
     </main>
 
     <footer class="site-footer">
-        <small>© {{ now.year }} Derechos de autor. RA.CUEVA</small>
+        <div class="footer-content">
+            <h3><i class="fas fa-book"></i> Librería y Papelería Cueva</h3>
+            <p class="mb-2">Sistema de gestión integral</p>
+            
+            <div class="footer-links">
+                <span><i class="fas fa-envelope"></i> contacto@cueva.com</span>
+                <span><i class="fas fa-phone"></i> +593 98 765 4321</span>
+                <span><i class="fas fa-map-marker-alt"></i> Ciudad del Conocimiento</span>
+            </div>
+            
+            <div class="mt-3">
+                <small>&copy; {{ now.year }} Todos los derechos reservados</small>
+            </div>
+        </div>
     </footer>
 
     {% block extra_js %}{% endblock %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Confirmación para eliminaciones
+            const deleteForms = document.querySelectorAll('form[onsubmit]');
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    if (!confirm('¿Está seguro de que desea eliminar este registro? Esta acción no se puede deshacer.')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            // Dropdown para exportar
+            const exportDropdown = document.querySelector('.export-dropdown');
+            if (exportDropdown) {
+                exportDropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.querySelector('.dropdown-content').classList.toggle('show');
+                });
+
+                // Cerrar dropdown al hacer click fuera
+                document.addEventListener('click', function(e) {
+                    if (!exportDropdown.contains(e.target)) {
+                        exportDropdown.querySelector('.dropdown-content').classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <style>
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: var(--card);
+            min-width: 120px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            top: 100%;
+            left: 0;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-content a {
+            color: var(--fg);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--brand);
+            color: white;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+    </style>
 </body>
 </html>

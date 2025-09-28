@@ -1,8 +1,8 @@
 [
     {
         "id": 1,
-        "nombre": "lapiz",
-        "cantidad": "10",
+        "nombre": "lapiz modificado",
+        "cantidad": "5",
         "precio": 1.0
     },
     {
@@ -40,5 +40,23 @@
         "nombre": "Bolígrafo azul",
         "cantidad": "200",
         "precio": 1.0
+    },
+    {
+        "id": 36,
+        "nombre": "papel bond",
+        "cantidad": "100",
+        "precio": 4.0
+    },
+    {
+        "id": 37,
+        "nombre": "silicona 1l",
+        "cantidad": "10",
+        "precio": 2.0
+    },
+    {
+        "id": 38,
+        "nombre": "pizarra",
+        "cantidad": "25",
+        "precio": 15.0
     }
 ]

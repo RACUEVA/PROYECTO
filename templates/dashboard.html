@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+    <p class="text-muted">Resumen general del sistema</p>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Tarjeta de Productos -->
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ stats.productos.total if stats.productos else 0 }}</h3>
+            <p>Total Productos</p>
+            <small class="text-muted">
+                Stock total: {{ stats.productos.stock_total if stats.productos else 0 }} unidades
+            </small>
+        </div>
+    </div>
+
+    <!-- Tarjeta de Clientes -->
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ stats.clientes if stats.clientes else 0 }}</h3>
+            <p>Total Clientes</p>
+            <small class="text-muted">
+                Este mes: {{ stats.clientes_este_mes if stats.clientes_este_mes else 0 }}
+            </small>
+        </div>
+    </div>
+
+    <!-- Tarjeta de Stock Bajo -->
+    <div class="stats-card {% if stats.bajo_stock and stats.bajo_stock > 0 %}stats-warning{% endif %}">
+        <div class="stats-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ stats.bajo_stock if stats.bajo_stock else 0 }}</h3>
+            <p>Productos con Stock Bajo</p>
+            <small class="text-muted">
+                {% if stats.bajo_stock and stats.bajo_stock > 0 %}
+                <a href="{{ url_for('productos_stock_bajo') }}" class="warning-link">Ver detalles</a>
+                {% else %}Todo en orden{% endif %}
+            </small>
+        </div>
+    </div>
+
+    <!-- Tarjeta de Precio Promedio -->
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stats-content">
+            <h3>${{ "%.2f"|format(stats.productos.precio_promedio) if stats.productos and stats.productos.precio_promedio else '0.00' }}</h3>
+            <p>Precio Promedio</p>
+            <small class="text-muted">Precio promedio de productos</small>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="quick-actions">
+    <h2><i class="fas fa-bolt"></i> Acciones Rápidas</h2>
+    <div class="actions-grid">
+        <a href="{{ url_for('crear_producto') }}" class="action-card">
+            <i class="fas fa-plus"></i>
+            <span>Nuevo Producto</span>
+        </a>
+        <a href="{{ url_for('crear_cliente') }}" class="action-card">
+            <i class="fas fa-user-plus"></i>
+            <span>Nuevo Cliente</span>
+        </a>
+        <a href="{{ url_for('productos_stock_bajo') }}" class="action-card">
+            <i class="fas fa-chart-bar"></i>
+            <span>Stock Bajo</span>
+        </a>
+        <a href="{{ url_for('listar_productos') }}" class="action-card">
+            <i class="fas fa-list"></i>
+            <span>Ver Inventario</span>
+        </a>
+    </div>
+</div>
+
+<!-- Últimos Productos Agregados -->
+<div class="recent-section">
+    <h2><i class="fas fa-clock"></i> Actividad Reciente</h2>
+    <div class="form-card">
+        <p class="text-muted">Funcionalidad en desarrollo. Próximamente mostrará la actividad reciente del sistema.</p>
+        <div class="coming-soon">
+            <i class="fas fa-tools"></i>
+            <span>En construcción</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stats-card {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    color: var(--brand);
+}
+
+.stats-content h3 {
+    font-size: 2rem;
+    margin: 0;
+    color: var(--fg);
+}
+
+.stats-content p {
+    margin: 0.25rem 0;
+    font-weight: 600;
+}
+
+.stats-warning {
+    border-color: var(--warn);
+}
+
+.stats-warning .stats-icon {
+    color: var(--warn);
+}
+
+.warning-link {
+    color: var(--warn);
+    text-decoration: none;
+}
+
+.warning-link:hover {
+    text-decoration: underline;
+}
+
+.quick-actions {
+    margin: 2rem 0;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.action-card {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--fg);
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-card:hover {
+    background: var(--brand);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.action-card i {
+    font-size: 2rem;
+}
+
+.recent-section {
+    margin-top: 2rem;
+}
+
+.coming-soon {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+}
+
+.coming-soon i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

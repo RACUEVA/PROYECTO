@@ -1,4 +1,4 @@
-1, lapiz, 10, 1
+1, lapiz modificado, 5, 1
 30, borrador, 100, 1
 31, tablero de madera, 10, 25
 32, Lápiz HB, 100, 1
@@ -7,3 +7,4 @@
 35, Bolígrafo azul, 200, 1
 36, papel bond, 100, 4
 37, silicona 1l, 10, 2
+38, pizarra, 25, 15

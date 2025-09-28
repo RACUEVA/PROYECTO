@@ -8,7 +8,8 @@ def conexion():
             host='localhost',
             database='papeleria_cueva',
             user='root',
-            password='uea2025'
+            password='uea2025',
+            autocommit=False  # Desactivar autocommit para controlar manualmente
         )
         if conn.is_connected():
             print("✓ Conexión exitosa a la base de datos")
@@ -27,10 +28,14 @@ def crear_tablas():
     try:
         conn = conexion()
         if conn is None:
-            print("No se pudo conectar a la base de datos")
+            print("✗ No se pudo conectar a la base de datos")
             return False
             
         cursor = conn.cursor()
+        
+        # Primero verificar si la base de datos existe, si no crearla
+        cursor.execute("CREATE DATABASE IF NOT EXISTS papeleria_cueva")
+        cursor.execute("USE papeleria_cueva")
         
         # Tabla de productos
         sql_productos = """
@@ -93,7 +98,38 @@ def crear_tablas():
         if conn:
             cerrar_conexion(conn)
 
-if __name__ == '__main__':
-    crear_tablas()
+# Función para verificar específicamente la tabla usuarios
+def verificar_tabla_usuarios():
+    conn = None
+    try:
+        conn = conexion()
+        if conn is None:
+            return False
+            
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM information_schema.tables 
+            WHERE table_schema = 'papeleria_cueva' 
+            AND table_name = 'usuarios'
+        """)
+        existe = cursor.fetchone()[0] > 0
+        
+        if existe:
+            print("La tabla 'usuarios' existe")
+        else:
+            print("La tabla 'usuarios' NO existe")
+            
+        return existe
+        
+    except Error as e:
+        print(f"Error al verificar tabla usuarios: {e}")
+        return False
+    finally:
+        if conn:
+            cerrar_conexion(conn)
 
-    
+if __name__ == '__main__':
+    print("=== EJECUTANDO CREACIÓN DE TABLAS ===")
+    crear_tablas()
+    verificar_tabla_usuarios()
