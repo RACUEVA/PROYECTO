@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Compras{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-with-btn">
+        <h1>Compras</h1>
+        <a class="btn btn-primary" href="{{ url_for('crear_compra') }}"> + Nueva Compra</a>
+    </div>
+
+    {% if compras %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Proveedor</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Compra</th>
+                <th>Fecha</th>
+                <th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for compra in compras %}
+            <tr>
+                <td>{{ compra.id }}</td>
+                <td>{{ compra.proveedor_nombre }}</td>
+                <td>{{ compra.producto_nombre }}</td>
+                <td>{{ compra.cantidad }}</td>
+                <td>${{ "%.2f"|format(compra.precio_compra) }}</td>
+                <td>{{ compra.fecha_compra.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ compra.usuario_nombre }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No hay compras para mostrar.</p>
+    {% endif %}
+</div>
+{% endblock %}

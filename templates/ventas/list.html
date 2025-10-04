@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Ventas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-with-btn">
+        <h1>Ventas</h1>
+        <a class="btn btn-primary" href="{{ url_for('crear_venta') }}"> + Nueva Venta</a>
+    </div>
+
+    {% if ventas %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.id }}</td>
+                <td>{{ venta.cliente_nombre }} {{ venta.cliente_apellido }}</td>
+                <td>{{ venta.usuario_nombre }}</td>
+                <td>{{ venta.fecha_venta.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>${{ "%.2f"|format(venta.total) }}</td>
+                <td>
+                    <span class="badge {% if venta.estado == 'completada' %}badge-success{% else %}badge-warning{% endif %}">
+                        {{ venta.estado }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No hay ventas para mostrar.</p>
+    {% endif %}
+</div>
+{% endblock %}

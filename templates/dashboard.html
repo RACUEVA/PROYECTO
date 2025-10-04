@@ -63,6 +63,32 @@
             <small class="text-muted">Precio promedio de productos</small>
         </div>
     </div>
+
+    <!-- NUEVA: Tarjeta de Ventas -->
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ stats.ventas.total if stats.ventas else 0 }}</h3>
+            <p>Total Ventas</p>
+            <small class="text-muted">
+                Ingresos: ${{ "%.2f"|format(stats.ventas.ingresos) if stats.ventas and stats.ventas.ingresos else '0.00' }}
+            </small>
+        </div>
+    </div>
+
+    <!-- NUEVA: Tarjeta de Compras -->
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-truck"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ stats.compras if stats.compras else 0 }}</h3>
+            <p>Total Compras</p>
+            <small class="text-muted">Compras registradas</small>
+        </div>
+    </div>
 </div>
 
 <!-- Acciones Rápidas -->
@@ -76,6 +102,15 @@
         <a href="{{ url_for('crear_cliente') }}" class="action-card">
             <i class="fas fa-user-plus"></i>
             <span>Nuevo Cliente</span>
+        </a>
+        <!-- NUEVAS ACCIONES RÁPIDAS -->
+        <a href="{{ url_for('crear_venta') }}" class="action-card">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Nueva Venta</span>
+        </a>
+        <a href="{{ url_for('crear_compra') }}" class="action-card">
+            <i class="fas fa-truck"></i>
+            <span>Nueva Compra</span>
         </a>
         <a href="{{ url_for('productos_stock_bajo') }}" class="action-card">
             <i class="fas fa-chart-bar"></i>

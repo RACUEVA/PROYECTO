@@ -1,3 +1,4 @@
+# forms.py
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DecimalField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, NumberRange, EqualTo
@@ -15,7 +16,7 @@ class ClienteForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Guardar')
 
-# Nuevos formularios para login y registro
+# Formularios para login y registro
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Contraseña', validators=[DataRequired()])
@@ -27,4 +28,17 @@ class RegistroForm(FlaskForm):
     password = PasswordField('Contraseña', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirmar Contraseña', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Registrarse')
-    
+
+# Nuevos formularios para ventas y compras
+class VentaForm(FlaskForm):
+    cliente_id = IntegerField('ID Cliente', validators=[DataRequired(), NumberRange(min=1)])
+    producto_id = IntegerField('ID Producto', validators=[DataRequired(), NumberRange(min=1)])
+    cantidad = IntegerField('Cantidad', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Realizar Venta')
+
+class CompraForm(FlaskForm):
+    proveedor_nombre = StringField('Proveedor', validators=[DataRequired(), Length(min=2, max=120)])
+    producto_id = IntegerField('ID Producto', validators=[DataRequired(), NumberRange(min=1)])
+    cantidad = IntegerField('Cantidad', validators=[DataRequired(), NumberRange(min=1)])
+    precio_compra = DecimalField('Precio Compra', validators=[DataRequired(), NumberRange(min=0)], places=2)
+    submit = SubmitField('Registrar Compra')

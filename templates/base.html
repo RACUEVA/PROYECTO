@@ -35,6 +35,17 @@
                         <i class="fas fa-users"></i> Clientes
                     </a>
                     
+                    <!-- NUEVOS ENLACES PARA VENTAS Y COMPRAS -->
+                    <a href="{{ url_for('listar_ventas') }}" 
+                        {% if request.endpoint in ['listar_ventas', 'crear_venta'] %}class="active"{% endif %}>
+                        <i class="fas fa-shopping-cart"></i> Ventas
+                    </a>
+
+                    <a href="{{ url_for('listar_compras') }}" 
+                        {% if request.endpoint in ['listar_compras', 'crear_compra'] %}class="active"{% endif %}>
+                        <i class="fas fa-truck"></i> Compras
+                    </a>
+                    
                     <div class="export-dropdown">
                         <a href="#" class="btn btn-secondary btn-small">
                             <i class="fas fa-download"></i> Exportar

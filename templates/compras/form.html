@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Nueva Compra{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Nueva Compra</h1>
+
+    <div class="form-card">
+        <form method="post">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                {{ form.proveedor_nombre.label }}
+                {{ form.proveedor_nombre(class="input") }}
+                {% for e in form.proveedor_nombre.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.producto_id.label }}
+                {{ form.producto_id(class="input") }}
+                {% for e in form.producto_id.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.cantidad.label }}
+                {{ form.cantidad(class="input") }}
+                {% for e in form.cantidad.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.precio_compra.label }}
+                {{ form.precio_compra(class="input") }}
+                {% for e in form.precio_compra.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+                <a class="btn btn-secondary" href="{{ url_for('listar_compras') }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

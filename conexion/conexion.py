@@ -37,17 +37,19 @@ def crear_tablas():
         cursor.execute("CREATE DATABASE IF NOT EXISTS papeleria_cueva")
         cursor.execute("USE papeleria_cueva")
         
-        # Tabla de productos
+        # Tabla de productos (actualizada según tu estructura)
         sql_productos = """
         CREATE TABLE IF NOT EXISTS productos (
             id INT AUTO_INCREMENT PRIMARY KEY,
             nombre VARCHAR(120) NOT NULL UNIQUE,
             cantidad INT NOT NULL DEFAULT 0,
-            precio DECIMAL(10, 2) NOT NULL DEFAULT 0.0
+            precio DECIMAL(10, 2) NOT NULL DEFAULT 0.0,
+            categoria VARCHAR(50) DEFAULT 'general',
+            activo TINYINT(1) DEFAULT 1
         );
         """
         
-        # Tabla de clientes
+        # Tabla de clientes (ya existe)
         sql_clientes = """
         CREATE TABLE IF NOT EXISTS clientes (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,7 +61,7 @@ def crear_tablas():
         );
         """
         
-        # Tabla de usuarios (para el sistema de login)
+        # Tabla de usuarios (ya existe)
         sql_usuarios = """
         CREATE TABLE IF NOT EXISTS usuarios (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,14 +72,56 @@ def crear_tablas():
         );
         """
         
-        print("Verificando/Creando tabla 'productos'...")
+        # Tabla de ventas (nueva)
+        sql_ventas = """
+        CREATE TABLE IF NOT EXISTS ventas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            cliente_id INT NOT NULL,
+            usuario_id INT NOT NULL,
+            fecha_venta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            total DECIMAL(10,2) NOT NULL,
+            estado ENUM('pendiente','completada','cancelada') DEFAULT 'completada',
+            FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        );
+        """
+        
+        # Tabla de detalle_ventas (nueva)
+        sql_detalle_ventas = """
+        CREATE TABLE IF NOT EXISTS detalle_ventas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            venta_id INT NOT NULL,
+            producto_id INT NOT NULL,
+            cantidad INT NOT NULL,
+            precio_unitario DECIMAL(5,2) NOT NULL,
+            subtotal DECIMAL(10,2) NOT NULL,
+            FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE CASCADE,
+            FOREIGN KEY (producto_id) REFERENCES productos(id)
+        );
+        """
+        
+        # Tabla de compras (nueva)
+        sql_compras = """
+        CREATE TABLE IF NOT EXISTS compras (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            proveedor_nombre VARCHAR(120) NOT NULL,
+            producto_id INT NOT NULL,
+            cantidad INT NOT NULL,
+            precio_compra DECIMAL(5,2) NOT NULL,
+            fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            usuario_id INT NOT NULL,
+            FOREIGN KEY (producto_id) REFERENCES productos(id),
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        );
+        """
+        
+        print("Verificando/Creando tablas...")
         cursor.execute(sql_productos)
-        
-        print("Verificando/Creando tabla 'clientes'...")
         cursor.execute(sql_clientes)
-        
-        print("Verificando/Creando tabla 'usuarios'...")
         cursor.execute(sql_usuarios)
+        cursor.execute(sql_ventas)
+        cursor.execute(sql_detalle_ventas)
+        cursor.execute(sql_compras)
         
         conn.commit()
         print("Todas las tablas verificadas/creadas correctamente.")

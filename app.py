@@ -1,9 +1,9 @@
-# app.py - VERSIÓN FINAL CORREGIDA
+# app.py - VERSIÓN FINAL COMPLETA
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from conexion.conexion import conexion, cerrar_conexion, crear_tablas, verificar_tabla_usuarios
-from forms import ProductoForm, ClienteForm, LoginForm, RegistroForm 
+from forms import ProductoForm, ClienteForm, LoginForm, RegistroForm, VentaForm, CompraForm
 from models_user import Usuario 
 from datetime import datetime
 from decimal import Decimal
@@ -565,17 +565,179 @@ def eliminar_cliente(cid):
     
     return redirect(url_for('listar_clientes'))
 
+# ---- Ventas ----
+@app.route('/ventas')
+@login_required
+def listar_ventas():
+    conn = conexion()
+    ventas = []
+    
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute("""
+            SELECT v.*, c.nombre as cliente_nombre, c.apellido as cliente_apellido,
+                   u.nombre as usuario_nombre
+            FROM ventas v
+            JOIN clientes c ON v.cliente_id = c.id
+            JOIN usuarios u ON v.usuario_id = u.id
+            ORDER BY v.fecha_venta DESC
+        """)
+        ventas = cur.fetchall()
+        
+    except Exception as e:
+        flash(f'❌ Error al cargar ventas: {str(e)}', 'error')
+    finally:
+        cerrar_conexion(conn)
+    
+    return render_template('ventas/list.html', title='Ventas', ventas=ventas)
+
+@app.route('/ventas/nueva', methods=['GET', 'POST'])
+@login_required
+def crear_venta():
+    form = VentaForm()
+    
+    if form.validate_on_submit():
+        cliente_id = form.cliente_id.data
+        producto_id = form.producto_id.data
+        cantidad = form.cantidad.data
+        
+        conn = conexion()
+        if conn is None:
+            handle_db_error()
+            return render_template('ventas/form.html', title='Nueva Venta', form=form)
+        
+        try:
+            cursor = conn.cursor(dictionary=True)
+            
+            # Verificar que el producto existe y tiene stock
+            cursor.execute("SELECT nombre, precio, cantidad FROM productos WHERE id = %s", (producto_id,))
+            producto = cursor.fetchone()
+            
+            if not producto:
+                flash('❌ Producto no encontrado', 'error')
+                return render_template('ventas/form.html', title='Nueva Venta', form=form)
+            
+            if producto['cantidad'] < cantidad:
+                flash(f'❌ Stock insuficiente. Solo hay {producto["cantidad"]} unidades', 'error')
+                return render_template('ventas/form.html', title='Nueva Venta', form=form)
+            
+            # Verificar que el cliente existe
+            cursor.execute("SELECT id FROM clientes WHERE id = %s", (cliente_id,))
+            if not cursor.fetchone():
+                flash('❌ Cliente no encontrado', 'error')
+                return render_template('ventas/form.html', title='Nueva Venta', form=form)
+            
+            # Calcular total
+            precio_unitario = producto['precio']
+            subtotal = precio_unitario * cantidad
+            
+            # Crear venta
+            cursor.execute(
+                "INSERT INTO ventas (cliente_id, usuario_id, total) VALUES (%s, %s, %s)",
+                (cliente_id, current_user.id, subtotal)
+            )
+            venta_id = cursor.lastrowid
+            
+            # Crear detalle de venta
+            cursor.execute(
+                "INSERT INTO detalle_ventas (venta_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (%s, %s, %s, %s, %s)",
+                (venta_id, producto_id, cantidad, precio_unitario, subtotal)
+            )
+            
+            conn.commit()
+            flash('✅ Venta registrada correctamente', 'success')
+            return redirect(url_for('listar_ventas'))
+            
+        except Exception as e:
+            conn.rollback()
+            flash(f'❌ Error al registrar venta: {str(e)}', 'error')
+        finally:
+            cerrar_conexion(conn)
+    
+    return render_template('ventas/form.html', title='Nueva Venta', form=form)
+
+# ---- Compras ----
+@app.route('/compras')
+@login_required
+def listar_compras():
+    conn = conexion()
+    compras = []
+    
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute("""
+            SELECT c.*, p.nombre as producto_nombre, u.nombre as usuario_nombre
+            FROM compras c
+            JOIN productos p ON c.producto_id = p.id
+            JOIN usuarios u ON c.usuario_id = u.id
+            ORDER BY c.fecha_compra DESC
+        """)
+        compras = cur.fetchall()
+        
+    except Exception as e:
+        flash(f'❌ Error al cargar compras: {str(e)}', 'error')
+    finally:
+        cerrar_conexion(conn)
+    
+    return render_template('compras/list.html', title='Compras', compras=compras)
+
+@app.route('/compras/nueva', methods=['GET', 'POST'])
+@login_required
+def crear_compra():
+    form = CompraForm()
+    
+    if form.validate_on_submit():
+        proveedor_nombre = form.proveedor_nombre.data.strip()
+        producto_id = form.producto_id.data
+        cantidad = form.cantidad.data
+        precio_compra = form.precio_compra.data
+        
+        conn = conexion()
+        if conn is None:
+            handle_db_error()
+            return render_template('compras/form.html', title='Nueva Compra', form=form)
+        
+        try:
+            cursor = conn.cursor(dictionary=True)
+            
+            # Verificar que el producto existe
+            cursor.execute("SELECT id FROM productos WHERE id = %s", (producto_id,))
+            if not cursor.fetchone():
+                flash('❌ Producto no encontrado', 'error')
+                return render_template('compras/form.html', title='Nueva Compra', form=form)
+            
+            # Registrar compra
+            cursor.execute(
+                "INSERT INTO compras (proveedor_nombre, producto_id, cantidad, precio_compra, usuario_id) VALUES (%s, %s, %s, %s, %s)",
+                (proveedor_nombre, producto_id, cantidad, precio_compra, current_user.id)
+            )
+            
+            # Actualizar stock del producto
+            cursor.execute(
+                "UPDATE productos SET cantidad = cantidad + %s WHERE id = %s",
+                (cantidad, producto_id)
+            )
+            
+            conn.commit()
+            flash('✅ Compra registrada correctamente', 'success')
+            return redirect(url_for('listar_compras'))
+            
+        except Exception as e:
+            conn.rollback()
+            flash(f'❌ Error al registrar compra: {str(e)}', 'error')
+        finally:
+            cerrar_conexion(conn)
+    
+    return render_template('compras/form.html', title='Nueva Compra', form=form)
+
 # ---- Dashboard y Estadísticas ----
 @app.route('/dashboard')
 @login_required
 def dashboard():
     """Dashboard con estadísticas del sistema"""
     conn = conexion()
-    if conn is None:
-        handle_db_error()
-        return render_template('dashboard.html', stats={})
-    
     stats = {}
+    
     try:
         cur = conn.cursor(dictionary=True)
         
@@ -603,6 +765,20 @@ def dashboard():
         cur.execute("SELECT COUNT(*) as este_mes FROM clientes WHERE MONTH(fecha_registro) = MONTH(CURRENT_DATE())")
         clientes_mes = cur.fetchone()
         stats['clientes_este_mes'] = int(clientes_mes['este_mes']) if clientes_mes else 0
+        
+        # Estadísticas de ventas
+        cur.execute("SELECT COUNT(*) as total, SUM(total) as ingresos FROM ventas WHERE estado = 'completada'")
+        ventas_stats = cur.fetchone()
+        if ventas_stats:
+            stats['ventas'] = {
+                'total': int(ventas_stats['total']),
+                'ingresos': float(ventas_stats['ingresos'] or 0)
+            }
+        
+        # Estadísticas de compras
+        cur.execute("SELECT COUNT(*) as total FROM compras")
+        compras_stats = cur.fetchone()
+        stats['compras'] = int(compras_stats['total']) if compras_stats else 0
         
     except Exception as e:
         print(f"Error obteniendo estadísticas: {e}")
@@ -840,7 +1016,9 @@ def test_crud():
             'editar_producto': '/productos/<id>/editar',
             'eliminar_producto': '/productos/<id>/eliminar',
             'dashboard': '/dashboard',
-            'exportar': '/guardar_csv, /guardar_json, /guardar_txt'
+            'exportar': '/guardar_csv, /guardar_json, /guardar_txt',
+            'ventas': '/ventas',
+            'compras': '/compras'
         },
         'timestamp': datetime.now().isoformat()
     })
@@ -848,12 +1026,9 @@ def test_crud():
 if __name__ == '__main__':
     print("🚀 Iniciando aplicación Flask...")
     print("📊 Dashboard disponible en: /dashboard")
+    print("🛒 Ventas disponible en: /ventas")
+    print("📦 Compras disponible en: /compras")
     print("🔧 Diagnóstico del sistema en: /diagnostico")
     print("❤️ Health check en: /health")
     print("🧪 Test CRUD en: /test-crud")
-    print("📍 Rutas CRUD específicas:")
-    print("   - Crear: /crear")
-    print("   - Listar: /productos") 
-    print("   - Editar: /editar/<id>")
-    print("   - Eliminar: /eliminar/<id>")
     app.run(debug=True, host='0.0.0.0', port=5000)

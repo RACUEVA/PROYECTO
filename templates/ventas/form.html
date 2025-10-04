@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Nueva Venta{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Nueva Venta</h1>
+
+    <div class="form-card">
+        <form method="post">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                {{ form.cliente_id.label }}
+                {{ form.cliente_id(class="input") }}
+                {% for e in form.cliente_id.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.producto_id.label }}
+                {{ form.producto_id(class="input") }}
+                {% for e in form.producto_id.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.cantidad.label }}
+                {{ form.cantidad(class="input") }}
+                {% for e in form.cantidad.errors %}
+                <small class="error">{{ e }}</small>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+                <a class="btn btn-secondary" href="{{ url_for('listar_ventas') }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
